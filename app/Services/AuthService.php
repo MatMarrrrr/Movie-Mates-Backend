@@ -3,15 +3,14 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Http\Requests\RegisterRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class AuthService
 {
-    public function registerUser(RegisterRequest $request): JsonResponse
+    public function registerUser(array $request): JsonResponse
     {
-        $validatedData = $request->validated();
+        $validatedData = $request;
 
         $user = User::create([
             'login' => $validatedData['login'],
