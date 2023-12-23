@@ -16,27 +16,28 @@ class GoogleAuthController extends Controller
 
     public function callbackGoogle()
     {
-        try{
+        try {
             $google_user = Socialite::driver('google')->stateless()->user();
 
             $user = User::where('google_id', $google_user->getId())->first();
 
-            if(!$user){
-                $new_user = User::create([
+            if (!$user) {
+                $user = User::create([
                     'login' => $google_user->getName(),
                     'email' => $google_user->getEmail(),
-                    'google_id' => $google_user->getId()
+                    'google_id' => $google_user->getId(),
+                    'avatar_url' => $google_user->getAvatar(),
                 ]);
-
-                Auth::login($new_user);
-
-                return response()->json($google_user);
-            }else{
-                Auth::login($user);
-                return redirect('http://localhost:5173/');
             }
-        }catch(\Throwable $th){
-            dd('Something went wrong!'. $th->getMessage());
+
+            Auth::login($user);
+
+            $token = $user->createToken('Personal Access Token')->plainTextToken;
+
+            return redirect('http://localhost:5173/google-callback?token=' . $token);
+
+        } catch (\Throwable $th) {
+            return redirect('http://localhost:5173/error');
         }
     }
 
