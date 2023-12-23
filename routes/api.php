@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FriendRequestController;
-
+use \App\Http\Controllers\GoogleAuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,6 +19,11 @@ use App\Http\Controllers\FriendRequestController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware(['web'])->group(function () {
+    Route::get('auth/google', [GoogleAuthController::class, 'redirect']);
+    Route::get('auth/google/callback', [GoogleAuthController::class, 'callbackGoogle']);
+});
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
