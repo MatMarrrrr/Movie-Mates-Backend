@@ -27,12 +27,13 @@ class GoogleAuthController extends Controller
                     'email' => $google_user->getEmail(),
                     'google_id' => $google_user->getId(),
                     'avatar_url' => $google_user->getAvatar(),
+                    'account_type' => '1',
                 ]);
             }
 
             Auth::login($user);
 
-            $token = $user->createToken('Personal Access Token')->plainTextToken;
+            $token = $user->createToken('authToken')->plainTextToken;
 
             return redirect('http://localhost:5173/google-callback?token=' . $token);
 
