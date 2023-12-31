@@ -24,4 +24,18 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Avatar updated successfully.']);
     }
+
+    public function updateLogin(Request $request)
+    {
+        $request->validate([
+            'login' => 'required|string|min:3|max:255|unique:users|not_regex:/@/'
+        ]);
+
+        $user = Auth::user();
+
+        $user->login = $request->input('login');
+        $user->save();
+
+        return response()->json(['message' => 'Login updated successfully.']);
+    }
 }

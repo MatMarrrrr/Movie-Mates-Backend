@@ -27,8 +27,11 @@ Route::get('auth/google/callback', [GoogleAuthController::class, 'callbackGoogle
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
-    Route::get('/user', [UserController::class, 'getUser']);
-    Route::put('/user/avatar', [UserController::class, 'updateAvatar']);
+    Route::prefix('user')->group(function () {
+        Route::get('/', [UserController::class, 'getUser']);
+        Route::put('/avatar', [UserController::class, 'updateAvatar']);
+        Route::put('/login', [UserController::class, 'updateLogin']);
+    });
 
     Route::post('/imgur/upload-image', [ImgurController::class, 'store']);
 
