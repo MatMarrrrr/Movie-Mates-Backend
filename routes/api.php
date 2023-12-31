@@ -30,7 +30,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);
     Route::put('/user/avatar', [UserController::class, 'updateAvatar']);
 
-    Route::post('/imgur-upload-image', [ImgurController::class, 'store']);
+    Route::post('/imgur/upload-image', [ImgurController::class, 'store']);
 
     Route::resource('friend-requests', FriendRequestController::class);
 });
