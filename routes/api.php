@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FriendRequestController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\ImgurController;
+use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,17 +22,15 @@ use App\Http\Controllers\ImgurController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/imgur-upload-image', [ImgurController::class, 'store']);
-
-Route::middleware(['web'])->group(function () {
-    Route::get('auth/google', [GoogleAuthController::class, 'redirect']);
-    Route::get('auth/google/callback', [GoogleAuthController::class, 'callbackGoogle']);
-});
+Route::get('auth/google', [GoogleAuthController::class, 'redirect']);
+Route::get('auth/google/callback', [GoogleAuthController::class, 'callbackGoogle']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+
+    Route::get('/user', [UserController::class, 'getUser']);
+    Route::put('/user/avatar', [UserController::class, 'updateAvatar']);
+
+    Route::post('/imgur-upload-image', [ImgurController::class, 'store']);
 
     Route::resource('friend-requests', FriendRequestController::class);
 });
