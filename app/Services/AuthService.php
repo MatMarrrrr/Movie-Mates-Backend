@@ -25,6 +25,18 @@ class AuthService
 
         return $this->loginUser($credentials);
     }
+    public function prepareCredentials(array $data): array
+    {
+        $identifier = $data['identifier'];
+        $password = $data['password'];
+
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            return ['email' => $identifier, 'password' => $password];
+        } else {
+            return ['login' => $identifier, 'password' => $password];
+        }
+    }
+
 
     public function loginUser(array $credentials): JsonResponse
     {

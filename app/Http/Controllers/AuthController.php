@@ -16,14 +16,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest  $request, AuthService $authService): JsonResponse
     {
-        $identifier = $request->get('identifier');
-        $password = $request->get('password');
-
-        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
-            $credentials = ['email' => $identifier, 'password' => $password];
-        } else {
-            $credentials = ['login' => $identifier, 'password' => $password];
-        }
+        $credentials = $authService->prepareCredentials($request->all());
         return $authService->loginUser($credentials);
     }
 }
