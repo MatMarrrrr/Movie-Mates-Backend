@@ -29,8 +29,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::prefix('user')->group(function () {
         Route::get('/', [UserController::class, 'getUser']);
-        Route::put('/avatar', [UserController::class, 'updateAvatar']);
+        Route::get('/all', [UserController::class, 'getAllUsers']);
         Route::put('/login', [UserController::class, 'updateLogin']);
+        Route::put('/avatar', [UserController::class, 'updateAvatar']);
     });
 
     Route::post('/imgur/upload-image', [ImgurController::class, 'store']);
