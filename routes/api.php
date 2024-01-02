@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MovieController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -24,6 +25,9 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('auth/google', [GoogleAuthController::class, 'redirect']);
 Route::get('auth/google/callback', [GoogleAuthController::class, 'callbackGoogle']);
+
+Route::get('/movies/{period}/{page?}', [MovieController::class, 'getMovies']);
+Route::get('/movie/{id}', [MovieController::class, 'getMovieDetails']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
