@@ -55,4 +55,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(FriendRequest::class, 'recipient_id');
     }
+
+    public function movieComments(): HasMany
+    {
+        return $this->hasMany(MovieComment::class, 'user_id');
+    }
 }

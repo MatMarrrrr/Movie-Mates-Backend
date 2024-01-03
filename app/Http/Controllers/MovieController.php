@@ -18,7 +18,10 @@ class MovieController extends Controller
         $response = Http::get($apiUrl);
 
         if ($response->successful()) {
-            return response()->json($response->json());
+            $responseData = $response->json();
+            $results = $responseData['results'] ?? [];
+
+            return response()->json($results);
         } else {
             return response()->json(['error' => 'Failed to fetch data from TMDb'], 500);
         }
