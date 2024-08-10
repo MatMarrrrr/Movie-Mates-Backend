@@ -49,7 +49,7 @@ class AuthService
             ], 200);
         } else {
             return response()->json([
-                'error' => 'Invalid credentials',
+                'message' => 'Invalid credentials',
             ], 401);
         }
     }

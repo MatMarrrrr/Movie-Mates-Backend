@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RegisterRequest extends FormRequest
 {
@@ -26,5 +28,14 @@ class RegisterRequest extends FormRequest
             'login.unique' => 'This login has already been taken',
             'email.unique' => 'This email has already been taken',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $errors = $validator->errors()->first();
+
+        throw new HttpResponseException(
+            response()->json(['message' => $errors], 422)
+        );
     }
 }
