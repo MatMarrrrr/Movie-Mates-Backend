@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
-
+use \Illuminate\Http\JsonResponse;
 class MovieController extends Controller
 {
-    public function getMovies($period, $page = 1)
+    public function getTrendingMovies($period, $page = 1): JsonResponse
     {
         if (!in_array($period, ['day', 'week'])) {
             return response()->json(['error' => 'Invalid period specified'], 400);
@@ -27,7 +27,7 @@ class MovieController extends Controller
         }
     }
 
-    public function getMovieDetails($id)
+    public function getMovieDetails($id): JsonResponse
     {
         $apiKey = env('TMDB_API_KEY');
         $apiUrl = "https://api.themoviedb.org/3/movie/$id?api_key=$apiKey";

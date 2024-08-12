@@ -41,7 +41,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/movie/{id}', [MovieController::class, 'getMovieDetails']);
 
     Route::prefix('movies')->group(function () {
-        Route::get('/{period}/{page?}', [MovieController::class, 'getMovies']);
+        Route::get('/trending/{period}/{page?}', [MovieController::class, 'getTrendingMovies']);
         Route::get('/{movieId}/comments', [CommentsController::class, 'getMovieComments']);
         Route::post('/{movieId}/comments', [CommentsController::class, 'addMovieComment']);
     });
