@@ -60,4 +60,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(MovieComment::class, 'user_id');
     }
+
+    public function friends()
+    {
+        $sent = $this->sentFriendRequests()
+            ->where('status', 'accepted')
+            ->pluck('recipient_id');
+
+        $received = $this->receivedFriendRequests()
+            ->where('status', 'accepted')
+            ->pluck('sender_id');
+
+        $friendIds = $sent->merge($received)->unique();
+
+        return User::whereIn('id', $friendIds)->get();
+    }
 }

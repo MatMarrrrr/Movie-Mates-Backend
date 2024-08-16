@@ -9,9 +9,31 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function getAllUsers()
+    public function getAllUsers(Request $request)
     {
-        $users = User::all();
+        $limit = $request->query('limit');
+
+        if ($limit) {
+            $users = User::limit($limit)->get();
+        } else {
+            $users = User::all();
+        }
+
+        return response()->json($users);
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $request->validate([
+            'query' => 'required|string|min:1|max:255'
+        ]);
+
+        $query = $request->input('query');
+
+        $users = User::where('email', 'LIKE', "%{$query}%")
+            ->orWhere('login', 'LIKE', "%{$query}%")
+            ->get();
+
         return response()->json($users);
     }
 
@@ -106,5 +128,13 @@ class UserController extends Controller
             'success' => true,
             'message' => 'Password changed successfully.',
         ]);
+    }
+
+    public function getFriends()
+    {
+        $user = Auth::user();
+        $friends = $user->friends();
+
+        return response()->json($friends);
     }
 }

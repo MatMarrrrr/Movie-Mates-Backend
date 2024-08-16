@@ -11,8 +11,17 @@ class FriendRequestController extends Controller
     {
         $user = auth()->user();
 
-        $sentRequests = $user->sentFriendRequests;
-        $receivedRequests = $user->receivedFriendRequests;
+        $sentRequests = $user->sentFriendRequests->map(function($request) {
+            return array_merge($request->toArray(), [
+                'userData' => $request->recipient
+            ]);
+        });
+
+        $receivedRequests = $user->receivedFriendRequests->map(function($request) {
+            return array_merge($request->toArray(), [
+                'userData' => $request->sender
+            ]);
+        });
 
         return response()->json([
             'sent_requests' => $sentRequests,
@@ -48,11 +57,16 @@ class FriendRequestController extends Controller
         ]);
 
         $friendRequest = FriendRequest::findOrFail($id);
-        $friendRequest->update([
-            'status' => $request->status,
-        ]);
 
-        return response()->json(['message' => 'Friend request updated successfully.', 'friend_request' => $friendRequest]);
+        if ($request->status === 'declined') {
+            $friendRequest->delete();
+            return response()->json(['message' => 'Friend request declined and deleted successfully.']);
+        } else {
+            $friendRequest->update([
+                'status' => $request->status,
+            ]);
+            return response()->json(['message' => 'Friend request updated successfully.', 'friend_request' => $friendRequest]);
+        }
     }
 
     public function destroy($id)

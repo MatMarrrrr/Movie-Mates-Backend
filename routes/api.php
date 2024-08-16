@@ -32,10 +32,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('user')->group(function () {
         Route::get('/', [UserController::class, 'getUser']);
         Route::get('/all', [UserController::class, 'getAllUsers']);
+        Route::get('/search', [UserController::class, 'searchUsers']);
         Route::patch('/login', [UserController::class, 'updateLogin']);
         Route::patch("/email", [UserController::class, 'updateEmail']);
         Route::patch("/password", [UserController::class, 'changePassword']);
         Route::patch('/avatar', [UserController::class, 'updateAvatar']);
+        Route::get('/friends', [UserController::class, 'getFriends']);
     });
 
     Route::post('/imgur/upload-image', [ImgurController::class, 'store']);
