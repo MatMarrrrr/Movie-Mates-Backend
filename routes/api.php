@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\FriendController;
 use App\Http\Controllers\MovieController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FriendRequestController;
@@ -50,6 +50,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/{movieId}/comments', [CommentsController::class, 'addMovieComment']);
     });
 
+    Route::delete('/friends/{friendId}/unfriend', [FriendController::class, 'unfriend']);
 
     Route::resource('friend-requests', FriendRequestController::class);
 });

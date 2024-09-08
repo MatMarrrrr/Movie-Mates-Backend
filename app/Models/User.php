@@ -63,15 +63,18 @@ class User extends Authenticatable
 
     public function friends()
     {
-        $sent = $this->sentFriendRequests()
-            ->where('status', 'accepted')
-            ->pluck('recipient_id');
+        $loggedUserId = $this->id;
 
-        $received = $this->receivedFriendRequests()
-            ->where('status', 'accepted')
-            ->pluck('sender_id');
-
-        $friendIds = $sent->merge($received)->unique();
+        $friendIds = Friend::where(function ($query) use ($loggedUserId) {
+            $query->where('friend1_id', $loggedUserId)
+                ->orWhere('friend2_id', $loggedUserId);
+        })
+            ->where('status', 'active')
+            ->get()
+            ->map(function ($friend) use ($loggedUserId) {
+                return $friend->friend1_id == $loggedUserId ? $friend->friend2_id : $friend->friend1_id;
+            })
+            ->unique();
 
         return User::whereIn('id', $friendIds)->get();
     }

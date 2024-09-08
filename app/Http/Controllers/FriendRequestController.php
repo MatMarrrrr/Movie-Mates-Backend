@@ -4,20 +4,30 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\FriendRequest;
+use App\Models\Friend;
 
 class FriendRequestController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
+        $status = $request->input('status');
 
-        $sentRequests = $user->sentFriendRequests->map(function($request) {
+        $sentRequestsQuery = $user->sentFriendRequests();
+        if ($status) {
+            $sentRequestsQuery->where('status', $status);
+        }
+        $sentRequests = $sentRequestsQuery->get()->map(function ($request) {
             return array_merge($request->toArray(), [
                 'userData' => $request->recipient
             ]);
         });
 
-        $receivedRequests = $user->receivedFriendRequests->map(function($request) {
+        $receivedRequestsQuery = $user->receivedFriendRequests();
+        if ($status) {
+            $receivedRequestsQuery->where('status', $status);
+        }
+        $receivedRequests = $receivedRequestsQuery->get()->map(function ($request) {
             return array_merge($request->toArray(), [
                 'userData' => $request->sender
             ]);
@@ -36,6 +46,19 @@ class FriendRequestController extends Controller
         ]);
 
         $user = auth()->user();
+
+        $existingRequest = FriendRequest::where(function ($query) use ($user, $request) {
+            $query->where('sender_id', $user->id)
+                ->where('recipient_id', $request->recipient_id);
+        })->orWhere(function ($query) use ($user, $request) {
+            $query->where('sender_id', $request->recipient_id)
+                ->where('recipient_id', $user->id);
+        })->first();
+
+        if ($existingRequest && $existingRequest->status === 'pending') {
+            return response()->json(['message' => 'There is already a pending friend request between these users.'], 400);
+        }
+
         $friendRequest = $user->sentFriendRequests()->create([
             'recipient_id' => $request->recipient_id,
         ]);
@@ -58,15 +81,32 @@ class FriendRequestController extends Controller
 
         $friendRequest = FriendRequest::findOrFail($id);
 
-        if ($request->status === 'declined') {
-            $friendRequest->delete();
-            return response()->json(['message' => 'Friend request declined and deleted successfully.']);
-        } else {
-            $friendRequest->update([
-                'status' => $request->status,
-            ]);
-            return response()->json(['message' => 'Friend request updated successfully.', 'friend_request' => $friendRequest]);
+        if ($request->status === 'accepted') {
+            $existingFriend = Friend::where(function ($query) use ($friendRequest) {
+                $query->where('friend1_id', $friendRequest->sender_id)
+                    ->where('friend2_id', $friendRequest->recipient_id);
+            })->orWhere(function ($query) use ($friendRequest) {
+                $query->where('friend1_id', $friendRequest->recipient_id)
+                    ->where('friend2_id', $friendRequest->sender_id);
+            })->first();
+
+            if ($existingFriend) {
+                $existingFriend->update(['status' => 'active']);
+            } else {
+                Friend::create([
+                    'friend1_id' => $friendRequest->sender_id,
+                    'friend2_id' => $friendRequest->recipient_id,
+                    'status' => 'active',
+                ]);
+            }
         }
+
+        $friendRequest->update([
+            'status' => $request->status,
+        ]);
+
+        return response()->json(['message' => 'Friend request updated successfully.', 'friend_request' => $friendRequest]);
+
     }
 
     public function destroy($id)

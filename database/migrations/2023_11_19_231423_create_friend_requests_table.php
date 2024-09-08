@@ -20,8 +20,6 @@ return new class extends Migration
 
             $table->foreign('sender_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('recipient_id')->references('id')->on('users')->onDelete('cascade');
-
-            $table->unique(['sender_id', 'recipient_id']);
         });
     }
 

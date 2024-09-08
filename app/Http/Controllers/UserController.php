@@ -12,11 +12,12 @@ class UserController extends Controller
     public function getAllUsers(Request $request)
     {
         $limit = $request->query('limit');
+        $loggedUserId = Auth::user()->id;
 
         if ($limit) {
-            $users = User::limit($limit)->get();
+            $users = User::where('id', '!=', $loggedUserId)->limit($limit)->get();
         } else {
-            $users = User::all();
+            $users = User::where('id', '!=', $loggedUserId)->get();
         }
 
         return response()->json($users);
@@ -30,8 +31,11 @@ class UserController extends Controller
 
         $query = $request->input('query');
 
-        $users = User::where('email', 'LIKE', "%{$query}%")
-            ->orWhere('login', 'LIKE', "%{$query}%")
+        $users = User::where('id', '!=', auth()->id())
+        ->where(function ($q) use ($query) {
+            $q->where('email', 'LIKE', "%{$query}%")
+                ->orWhere('login', 'LIKE', "%{$query}%");
+        })
             ->get();
 
         return response()->json($users);
